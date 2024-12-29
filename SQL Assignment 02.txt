@@ -1,0 +1,445 @@
+--1. Countries and their continents. Order the results by continent names.
+
+select 
+    c.countryname, 
+    con.continent
+from 
+    countries c
+join 
+    continents con
+on 
+    c.continent = con.contid
+order by 
+    con.continent;
+
+
+--2. Number of countries within each continent
+
+select 
+    con.continent, 
+    count(c.countryid) 
+from 
+    continents con
+join 
+    countries c
+on 
+    c.continent = con.contid
+group by 
+    con.continent;
+
+
+--3. countries with no car makers?
+
+select 
+    con.countryname
+from 
+    countries con
+left join 
+    car_makers cm
+on 
+    con.countryid = cm.country
+where 
+    cm.country is null;
+
+-- 4. List of Car makers from Japan
+
+select 
+    cm.maker, 
+    cm.fullname
+from 
+    car_makers cm
+join 
+    countries c 
+on 
+    c.countryid = cm.country
+where 
+    c.countryname = 'japan';
+
+
+--5. List of Car makers from France and USA
+
+select 
+    cm.maker, 
+    cm.fullname, 
+    c.countryname
+from 
+    car_makers cm
+join 
+    countries c 
+on 
+    c.countryid = cm.country
+where 
+    c.countryname in ('france', 'usa');
+
+
+--6. Country and continent of Volvo car maker
+select 
+    c.countryname, 
+    con.continent, 
+    cm.maker
+from 
+    car_makers cm
+join 
+    countries c 
+on 
+    cm.country = c.countryid
+join 
+    continents con 
+on 
+    c.continent = con.contid
+where 
+    cm.maker = 'volvo';
+
+
+--7. Car models from 'Ford Motor Company'
+
+select 
+    cm.fullname, md.model
+from
+    model_details md
+join
+    car_makers cm
+    on md.maker = cm.id
+where
+    cm.fullname = 'Ford Motor Company';
+
+
+--8. How many car models are made by Germany?
+select 
+    count(distinct md.model) as TOTAL_MODELS
+from 
+    model_details md
+join 
+    car_makers cm on md.maker = cm.id
+join
+    countries c on cm.country = c.countryid
+where
+    c.countryname = 'germany';
+
+--9. Car models made by Japan along with maker details.
+select
+    md.model , cm.maker , cm.fullname
+from
+    model_details md
+join
+    car_makers cm on md.maker = cm.id
+join
+    countries c on cm.country = c.countryid
+where
+    c.countryname = 'japan';
+
+--10. Which car models have highest and lowest values of below attributes. Extract the car maker and geography (country and continent) information also:
+--a. Mpg
+--b. Cylinders
+--c. Edispl
+--d. Horsepower
+--e. Weight
+--f. Acel
+
+--i) Highest Mpg
+select 
+    cd.mpg as HIGHEST_MPG, cn.model , cm.maker , cm.fullname , c.countryname , con.continent
+from 
+    continents con
+join
+    countries c on con.contid = c.continent
+join 
+    car_makers cm on c.countryid = cm.country
+join
+    model_details md on cm.id = md.maker
+join
+    car_names cn on md.model = cn.model
+join
+    car_details cd on cn.id = cd.id
+where
+    cd.mpg = (select max(mpg) from car_details);
+--ii) Lowest Mpg
+select cd.mpg as LOWEST_MPG, cn.model , cm.maker , cm.fullname , c.countryname , con.continent
+from continents con
+join countries c on con.contid = c.continent
+right join car_makers cm on c.countryid = cm.country
+join model_details md on cm.id = md.maker
+join car_names cn on md.model = cn.model
+join car_details cd on cn.id = cd.id
+where cd.mpg = (select min(mpg) from car_details)
+order by 1;
+
+
+--i) Highest Cylinders
+select
+    distinct cd.cylinders as HIGHEST_CYLINDERS, cn.model , cm.maker , cm.fullname , c.countryname , con.continent
+from
+    continents con
+join
+    countries c on con.contid = c.continent
+join
+    car_makers cm on c.countryid = cm.country
+join
+    model_details md on cm.id = md.maker
+join
+    car_names cn on md.model = cn.model
+join
+    car_details cd on cn.id = cd.id
+where
+    cd.cylinders = (select max(cylinders) from car_details);
+
+--ii) Lowest Cylinders
+select distinct
+    cd.cylinders as LOWEST_CYLINDERS, cn.model , cm.maker , cm.fullname , c.countryname , con.continent
+from
+    continents con
+join
+    countries c on con.contid = c.continent
+join
+    car_makers cm on c.countryid = cm.country
+join
+    model_details md on cm.id = md.maker
+join
+    car_names cn on md.model = cn.model
+join 
+    car_details cd on cn.id = cd.id
+where
+    cd.cylinders = (select min(cylinders) from car_details);
+
+
+
+--i) Highest Edispl
+select
+    distinct cd.edispl as HIGHEST_EDISPL, cn.model , cm.maker , cm.fullname , c.countryname , con.continent
+from
+    continents con
+join
+    countries c on con.contid = c.continent
+join
+    car_makers cm on c.countryid = cm.country
+join
+    model_details md on cm.id = md.maker
+join
+    car_names cn on md.model = cn.model
+join 
+    car_details cd on cn.id = cd.id
+where
+    cd.edispl = (select max(edispl) from car_details);
+
+--ii) Lowest Edispl
+select
+    cd.edispl as LOWEST_EDISPL, cn.model , cm.maker , cm.fullname , c.countryname , con.continent
+from
+    continents con
+join
+    countries c on con.contid = c.continent
+join
+    car_makers cm on c.countryid = cm.country
+join
+    model_details md on cm.id = md.maker
+join
+    car_names cn on md.model = cn.model
+join
+    car_details cd on cn.id = cd.id
+where
+    cd.edispl = (select min(edispl) from car_details);
+
+
+
+--i) Highest Horsepower
+select
+    cd.horsepower as HIGHEST_HORSEPOWER, cn.model , cm.maker , cm.fullname , c.countryname , con.continent
+from 
+    continents con
+join 
+    countries c on con.contid = c.continent
+join 
+    car_makers cm on c.countryid = cm.country
+join
+    model_details md on cm.id = md.maker
+join 
+    car_names cn on md.model = cn.model
+join 
+    car_details cd on cn.id = cd.id
+where
+    cd.horsepower = (select max(horsepower) from car_details);
+
+--ii) Lowest Horsepower
+select
+    distinct cd.horsepower as LOWEST_HORSEPOWER, cn.model , cm.maker , cm.fullname , c.countryname , con.continent
+from
+    continents con
+join
+    countries c on con.contid = c.continent
+join
+    car_makers cm on c.countryid = cm.country
+join
+    model_details md on cm.id = md.maker
+join
+    car_names cn on md.model = cn.model
+join
+    car_details cd on cn.id = cd.id
+where
+    cd.horsepower = (select min(horsepower) from car_details);
+
+
+
+--i) Highest Weight
+select
+    cd.weight as HIGHEST_WEIGHT, cn.model , cm.maker , cm.fullname , c.countryname , con.continent
+from
+    continents con
+join
+    countries c on con.contid = c.continent
+join
+    car_makers cm on c.countryid = cm.country
+join
+    model_details md on cm.id = md.maker
+join 
+    car_names cn on md.model = cn.model
+join
+    car_details cd on cn.id = cd.id
+where
+    cd.weight = (select max(weight) from car_details);
+
+--ii) Lowest Weight
+select
+    cd.weight as LOWEST_WEIGHT, cn.model , cm.maker , cm.fullname , c.countryname , con.continent
+from
+    continents con
+join
+    countries c on con.contid = c.continent
+join
+    car_makers cm on c.countryid = cm.country
+join
+    model_details md on cm.id = md.maker
+join
+    car_names cn on md.model = cn.model
+join
+    car_details cd on cn.id = cd.id
+where
+    cd.weight = (select min(weight) from car_details);
+
+
+
+--i) Highest Accel
+select
+    cd.accel as HIGHEST_ACCEL, cn.model , cm.maker , cm.fullname , c.countryname , con.continent
+from
+    continents con
+join
+    countries c on con.contid = c.continent
+join
+    car_makers cm on c.countryid = cm.country
+join
+    model_details md on cm.id = md.maker
+join 
+    car_names cn on md.model = cn.model
+join 
+    car_details cd on cn.id = cd.id
+where 
+    cd.accel = (select max(accel) from car_details);
+
+--ii) Lowest Accel
+select
+    cd.accel as LOWEST_ACCEL, cn.model , cm.maker , cm.fullname , c.countryname , con.continent
+from 
+    continents con
+join 
+    countries c on con.contid = c.continent
+join 
+    car_makers cm on c.countryid = cm.country
+join 
+    model_details md on cm.id = md.maker
+join
+    car_names cn on md.model = cn.model
+join 
+    car_details cd on cn.id = cd.id
+where
+    cd.accel = (select min(accel) from car_details);
+
+--11. In which year most cars were made?
+select
+    year, count(*) 
+from 
+    car_details c
+group by
+    year
+order by
+    2 desc
+fetch first 1 row only;
+
+
+--12. Which year had less cars made?
+select year, count(*) 
+from car_details c
+group by year
+order by 2
+fetch first 1 row only;
+
+
+--13. Min, Max and Average of below attributes around the year(s):
+--a. Mpg
+--b. Cylinders
+--c. Edispl
+--d. Horsepower
+--e. Weight
+--f. Acel
+
+select 
+    year,
+    min(mpg) as min_mpg,
+    max(mpg) as max_mpg,
+    avg(mpg) as avg_mpg,
+    min(cylinders) as min_cylinders,
+    max(cylinders) as max_cylinders,
+    avg(cylinders) as avg_cylinders,
+    min(edispl) as min_edispl,
+    max(edispl) as max_edispl,
+    avg(edispl) as avg_edispl,
+    min(horsepower) as min_horsepower,
+    max(horsepower) as max_horsepower,
+    avg(horsepower) as avg_horsepower,
+    min(weight) as min_weight,
+    max(weight) as max_weight,
+    avg(weight) as avg_weight,
+    min(accel) as min_accel,
+    max(accel) as max_accel,
+    avg(accel) as avg_accel
+from 
+    car_details
+group by 
+    year
+order by 
+    year;
+
+--14.  Please carry out a small statistical analysis around (1) Horsepower (2) Weight (3) Accel. Try calculating the mean, median and standard deviation. Use SQL queries to extract these measures. What do these measures convey about horsepower and weight of the cars data? Share SQLs and few bullets on your understanding on the values captured for mean, median and standard deviation
+
+--Horsepower 
+    
+select 
+    'horsepower' as attribute,
+    avg(horsepower) ,
+    median(horsepower) ,
+    stddev(horsepower) 
+from 
+    car_details;
+
+--Weight
+    
+select 
+    'weight' as attribute,
+    avg(weight) ,
+    median(weight) ,
+    stddev(weight) 
+from 
+    car_details;    
+
+
+--Acceleration
+
+select 
+    'acceleration' as attribute,
+    avg(accel) ,
+    median(accel) ,
+    stddev(accel) 
+from 
+    car_details;   
+
+
+
